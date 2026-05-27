@@ -32,12 +32,12 @@ app.post('/quote', async (req, res) => {
         address: "333 Col. Bonny Serrano Ave, San Juan City"
       },
       {
-        coordinates: {
-          lat: parseFloat(lat).toFixed(6).toString(),
-          lng: parseFloat(lng).toFixed(6).toString()
-        },
-        address: delivery_address
-      }
+  coordinates: {
+    lat: Number(lat).toFixed(7),
+    lng: Number(lng).toFixed(7)
+  },
+  address: delivery_address
+}
     ]
   }
 };
