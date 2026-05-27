@@ -29,17 +29,11 @@ app.post('/quote', async (req, res) => {
       language: "en_PH",
       stops: [
         {
-          coordinates: {
-            lat: "14.6058678",
-            lng: "121.0374405"
-          },
+          coordinates: { lat: "14.6058678", lng: "121.0374405" },
           address: "333 Col. Bonny Serrano Ave, San Juan City"
         },
         {
-          coordinates: {
-            lat: latStr,
-            lng: lngStr
-          },
+          coordinates: { lat: latStr, lng: lngStr },
           address: delivery_address
         }
       ]
@@ -63,8 +57,8 @@ app.post('/quote', async (req, res) => {
     });
 
     const responseText = await response.text();
-    console.log('Lalamove status:', response.status);
-    console.log('Lalamove response:', responseText);
+    console.log('Lalamove quote status:', response.status);
+    console.log('Lalamove quote response:', responseText);
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -75,10 +69,18 @@ app.post('/quote', async (req, res) => {
     }
 
     const data = JSON.parse(responseText);
-    return res.status(200).json(data);
+
+    // Extract stopIds and return them alongside the quotation
+    const senderStopId = data.data.stops[0].stopId;
+    const recipientStopId = data.data.stops[1].stopId;
+
+    return res.status(200).json({
+      ...data,
+      senderStopId,
+      recipientStopId
+    });
 
   } catch (error) {
-    console.log('Fetch error:', error.message);
     return res.status(500).json({
       error: error.message,
       cause: error.cause?.message || 'no cause',
@@ -89,25 +91,27 @@ app.post('/quote', async (req, res) => {
 
 // ── Place Order ──────────────────────────────────────────
 app.post('/order', async (req, res) => {
-  const { quotation_id, customer_id, contact_number } = req.body;
+  const { quotation_id, customer_id, contact_number, sender_stop_id, recipient_stop_id } = req.body;
 
   const timestamp = Date.now().toString();
   const method = 'POST';
   const path = '/v3/orders';
 
+  const cleanContact = `+63${String(contact_number).replace('=', '').replace(/^0/, '').replace(/^\+63/, '')}`;
+
   const body = {
     data: {
-      quotationId: quotation_id,
+      quotationId: String(quotation_id).replace('=', ''),
       sender: {
-        stopId: "",
+        stopId: String(sender_stop_id).replace('=', ''),
         name: "Le Fleur",
         phone: "+639625593930"
       },
       recipients: [
         {
-          stopId: "",
+          stopId: String(recipient_stop_id).replace('=', ''),
           name: "Customer",
-          phone: `+63${String(contact_number).replace('=', '').replace(/^0/, '')}`
+          phone: cleanContact
         }
       ]
     }
@@ -147,7 +151,6 @@ app.post('/order', async (req, res) => {
     return res.status(200).json(data);
 
   } catch (error) {
-    console.log('Fetch error:', error.message);
     return res.status(500).json({
       error: error.message,
       cause: error.cause?.message || 'no cause',
