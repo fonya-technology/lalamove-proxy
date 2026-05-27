@@ -24,27 +24,24 @@ app.post('/quote', async (req, res) => {
   const path = '/v3/quotations';
 
   const body = {
-  data: {
-    serviceType: "MOTORCYCLE",
-    language: "en_PH",
-    stops: [
-      {
-        coordinates: {
-          lat: latStr,
-          lng: lngStr
+    data: {
+      serviceType: "MOTORCYCLE",
+      language: "en_PH",
+      stops: [
+        {
+          coordinates: { lat: latStr, lng: lngStr },
+          address: delivery_address  // ← Customer (PICKUP)
         },
-        address: delivery_address  // ← Customer address (PICKUP)
-      },
-      {
-        coordinates: {
-          lat: "14.6058678",
-          lng: "121.0374405"
-        },
-        address: "333 Col. Bonny Serrano Ave, San Juan City"  // ← Le Fleur (DROPOFF)
-      }
-    ]
-  }
-};
+        {
+          coordinates: {
+            lat: "14.6058678",
+            lng: "121.0374405"
+          },
+          address: "333 Col. Bonny Serrano Ave, San Juan City"  // ← Le Fleur (DROPOFF)
+        }
+      ]
+    }
+  };
 
   const rawBody = JSON.stringify(body);
   const rawSignature = `${timestamp}\r\n${method}\r\n${path}\r\n\r\n${rawBody}`;
@@ -75,8 +72,6 @@ app.post('/quote', async (req, res) => {
     }
 
     const data = JSON.parse(responseText);
-
-    // Extract stopIds and return them alongside the quotation
     const senderStopId = data.data.stops[0].stopId;
     const recipientStopId = data.data.stops[1].stopId;
 
@@ -111,7 +106,7 @@ app.post('/order', async (req, res) => {
       sender: {
         stopId: String(sender_stop_id).replace('=', ''),
         name: "Customer",
-        phone: cleanContact  // ← Customer is the sender
+        phone: cleanContact  // ← Customer sends
       },
       recipients: [
         {
@@ -122,11 +117,10 @@ app.post('/order', async (req, res) => {
       ]
     }
   };
+
   const rawBody = JSON.stringify(body);
   const rawSignature = `${timestamp}\r\n${method}\r\n${path}\r\n\r\n${rawBody}`;
   const signature = crypto.createHmac('sha256', API_SECRET).update(rawSignature).digest('hex');
-
-  console.log('Place order body:', rawBody);
 
   try {
     const response = await fetch(`${BASE_URL}${path}`, {
