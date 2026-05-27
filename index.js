@@ -10,7 +10,7 @@ app.use(express.json());
 
 const API_KEY = 'pk_test_0f74e0a3aef202acc5012e42c7fcbe9c';
 const API_SECRET = 'sk_test_6ssmA+2jGNG4ax9r1eC16X9PyeTq8UY7+0SUF5tsC59fMCv9N2ZxhhwIv1rqV6t+';
-const BASE_URL = 'https://sandbox-rest.lalamove.com';
+const BASE_URL = 'https://rest.sandbox.lalamove.com';
 
 app.post('/quote', async (req, res) => {
   const { lat, lng, delivery_address, customer_id } = req.body;
@@ -20,6 +20,7 @@ app.post('/quote', async (req, res) => {
   const path = '/v3/quotations';
 
   const body = {
+  data: {
     serviceType: "MOTORCYCLE",
     language: "en_PH",
     stops: [
@@ -42,7 +43,8 @@ app.post('/quote', async (req, res) => {
       name: "Le Fleur",
       phone: "+639625593930"
     }
-  };
+  }
+};
 
   const rawBody = JSON.stringify(body);
   const rawSignature = `${timestamp}\r\n${method}\r\n${path}\r\n\r\n${rawBody}`;
