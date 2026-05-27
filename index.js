@@ -1,6 +1,9 @@
 const express = require('express');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
+const dns = require('dns');
+
+dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(express.json());
