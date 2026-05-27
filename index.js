@@ -18,8 +18,8 @@ app.post('/quote', async (req, res) => {
   console.log('Raw lat received:', lat, typeof lat);
   console.log('Raw lng received:', lng, typeof lng);
 
-  const latStr = Number(lat).toFixed(7);
-  const lngStr = Number(lng).toFixed(7);
+  const latStr = parseFloat(String(lat).replace('=', '')).toFixed(7);
+  const lngStr = parseFloat(String(lng).replace('=', '')).toFixed(7);
 
   console.log('Formatted lat:', latStr);
   console.log('Formatted lng:', lngStr);
