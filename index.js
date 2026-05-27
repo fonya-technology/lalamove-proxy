@@ -8,8 +8,8 @@ dns.setDefaultResultOrder('ipv4first');
 const app = express();
 app.use(express.json());
 
-const API_KEY = 'pk_test_0f74e0a3aef202acc5012e42c7fcbe9c';
-const API_SECRET = 'sk_test_6ssmA+2jGNG4ax9r1eC16X9PyeTq8UY7+0SUF5tsC59fMCv9N2ZxhhwIv1rqV6t+';
+const API_KEY = process.env.LALAMOVE_API_KEY;
+const API_SECRET = process.env.LALAMOVE_API_SECRET;
 const BASE_URL = 'https://rest.sandbox.lalamove.com';
 
 // ── Quotation ────────────────────────────────────────────
